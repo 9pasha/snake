@@ -3,17 +3,14 @@ const ctx = canvas.getContext('2d');
 const apple = document.getElementById('apple');
 const scoreCount = document.getElementById('score');
 const size = 20;
-let posX = 200;
-let posY = 200;
 let amount = 0;
 
 let snake = {
     length: [
-        {posX: posX, posY: posY},
-        {posX: posX-size, posY: posY},
-        {posX: posX-2*size, posY: posY}],
+        {posX: 200, posY: 200},
+        {posX: 200-size, posY: 200}],
     color: 'green',
-    direction: 'UP'
+    direction: 'RIGHT'
 };
 
 snake.head = snake.length[0];
@@ -42,33 +39,17 @@ document.addEventListener('keydown', function(e) {
         else if(key === 40 && snake.direction !== 'UP') {
             snake.direction = 'DOWN';
         }
-        return snake.direction;
     }
 
     direction(key);
-    snake.crush();
-    snake.eat();
 });
 
-snake.checkOverField = (obj, width, height) => {
-    if(obj.head.posX > width || obj.head.posX < 0 || obj.head.posY > height || obj.head.posY < 0) {
-        if(obj.head.posX > width) {
-            obj.head.posX = 0;
-        }
-        else if(obj.head.posX < 0) {
-            obj.head.posX = width - 20;
-        }
-        if(obj.head.posY > height) {
-            obj.head.posY = 0;
-        }
-        else if(obj.head.posY < 0) {
-            obj.head.posY = height - 20;
-        }
-    } 
-};
-
 snake.move = (obj, dir) => {
-    clearLastTarget(snake);
+    let len = obj.length.length;
+    let posX = obj.length[len-1].posX;
+    let posY = obj.length[len-1].posY;
+
+    ctx.clearRect(posX, posY, size, size);
    
     if(dir === 'RIGHT') {
         obj.length.unshift(obj.length.pop());
@@ -98,13 +79,30 @@ snake.move = (obj, dir) => {
     snake.checkOverField(snake, 660, 660);
     snake.crush();
     snake.eat();
-    drawTarget(obj.head.posX, obj.head.posY, obj.color);
+    snake.drawBody(obj.head.posX, obj.head.posY, obj.color);
 
     setTimeout(function() {
         snake.move(snake, snake.direction);
     }, 60);
 };
- 
+
+snake.checkOverField = (obj, width, height) => {
+    if(obj.head.posX > width || obj.head.posX < 0 || obj.head.posY > height || obj.head.posY < 0) {
+        if(obj.head.posX > width) {
+            obj.head.posX = 0;
+        }
+        else if(obj.head.posX < 0) {
+            obj.head.posX = width - 20;
+        }
+        if(obj.head.posY > height) {
+            obj.head.posY = 0;
+        }
+        else if(obj.head.posY < 0) {
+            obj.head.posY = height - 20;
+        }
+    } 
+};
+
 snake.crush = () => {
     for(let i = 1; i < snake.length.length; i++) {
         if(snake.head.posX == snake.length[i].posX && snake.head.posY == snake.length[i].posY) {
@@ -123,23 +121,16 @@ snake.eat = () => {
     }
 };
 
-function drawTarget(x, y, color) {
+snake.drawBody = (x, y, color) => {
     ctx.beginPath();
     ctx.fillStyle = color;
     ctx.fillRect(x, y, size, size);
     ctx.closePath();
-}
-
-function clearLastTarget(obj) {
-    let len = obj.length.length;
-    let posX = obj.length[len-1].posX;
-    let posY = obj.length[len-1].posY;
-    ctx.clearRect(posX, posY, size, size);
-}
+};
 
 snake.drawStartSnake = (obj) => {
     for(i in obj.length) {
-        drawTarget(obj.length[i].posX, obj.length[i].posY, obj.color);
+        snake.drawBody(obj.length[i].posX, obj.length[i].posY, obj.color);
     }
 };
 
