@@ -13,7 +13,7 @@ let snake = {
         {posX: posX-size, posY: posY},
         {posX: posX-2*size, posY: posY}],
     color: 'green',
-    direction: ''
+    direction: 'UP'
 };
 
 snake.head = snake.length[0];
@@ -44,62 +44,67 @@ document.addEventListener('keydown', function(e) {
         }
         return snake.direction;
     }
-    
-    function move(obj, dir) {
-        clearLastTarget(snake);
- 
-        if(dir === 'RIGHT') {
-            obj.length.unshift(obj.length.pop());
-            obj.length[0].posX = obj.length[1].posX+size;
-            obj.length[0].posY = obj.length[1].posY;
-            obj.head = obj.length[0];
-        }
-        else if(dir === 'LEFT') {
-            obj.length.unshift(obj.length.pop());
-            obj.length[0].posX = obj.length[1].posX-size;
-            obj.length[0].posY = obj.length[1].posY;
-            obj.head = obj.length[0];
-        }
-        else if(dir === 'UP') {
-            obj.length.unshift(obj.length.pop());
-            obj.length[0].posX = obj.length[1].posX;
-            obj.length[0].posY = obj.length[1].posY-size;
-            obj.head = obj.length[0];         
-        }
-        else if(dir === 'DOWN') {
-            obj.length.unshift(obj.length.pop());
-            obj.length[0].posX = obj.length[1].posX;
-            obj.length[0].posY = obj.length[1].posY+size;
-            obj.head = obj.length[0];
-        }
-
-        checkOverField(snake, 660, 660);
-        drawTarget(obj.head.posX, obj.head.posY, obj.color);
-    }
-
-    function checkOverField(obj, width, height) {
-        if(obj.head.posX > width || obj.head.posX < 0 || obj.head.posY > height || obj.head.posY < 0) {
-            if(obj.head.posX > width) {
-                obj.head.posX = 0;
-            }
-            else if(obj.head.posX < 0) {
-                obj.head.posX = width - 20;
-            }
-            if(obj.head.posY > height) {
-                obj.head.posY = 0;
-            }
-            else if(obj.head.posY < 0) {
-                obj.head.posY = height - 20;
-            }
-        } 
-    }
 
     direction(key);
-    move(snake, snake.direction);
     snake.crush();
     snake.eat();
 });
 
+snake.checkOverField = (obj, width, height) => {
+    if(obj.head.posX > width || obj.head.posX < 0 || obj.head.posY > height || obj.head.posY < 0) {
+        if(obj.head.posX > width) {
+            obj.head.posX = 0;
+        }
+        else if(obj.head.posX < 0) {
+            obj.head.posX = width - 20;
+        }
+        if(obj.head.posY > height) {
+            obj.head.posY = 0;
+        }
+        else if(obj.head.posY < 0) {
+            obj.head.posY = height - 20;
+        }
+    } 
+};
+
+snake.move = (obj, dir) => {
+    clearLastTarget(snake);
+   
+    if(dir === 'RIGHT') {
+        obj.length.unshift(obj.length.pop());
+        obj.length[0].posX = obj.length[1].posX+size;
+        obj.length[0].posY = obj.length[1].posY;
+        obj.head = obj.length[0];
+    }
+    else if(dir === 'LEFT') {
+        obj.length.unshift(obj.length.pop());
+        obj.length[0].posX = obj.length[1].posX-size;
+        obj.length[0].posY = obj.length[1].posY;
+        obj.head = obj.length[0];
+    }
+    else if(dir === 'UP') {
+        obj.length.unshift(obj.length.pop());
+        obj.length[0].posX = obj.length[1].posX;
+        obj.length[0].posY = obj.length[1].posY-size;
+        obj.head = obj.length[0];         
+    }
+    else if(dir === 'DOWN') {
+        obj.length.unshift(obj.length.pop());
+        obj.length[0].posX = obj.length[1].posX;
+        obj.length[0].posY = obj.length[1].posY+size;
+        obj.head = obj.length[0];
+    }
+    
+    snake.checkOverField(snake, 660, 660);
+    snake.crush();
+    snake.eat();
+    drawTarget(obj.head.posX, obj.head.posY, obj.color);
+
+    setTimeout(function() {
+        snake.move(snake, snake.direction);
+    }, 60);
+};
+ 
 snake.crush = () => {
     for(let i = 1; i < snake.length.length; i++) {
         if(snake.head.posX == snake.length[i].posX && snake.head.posY == snake.length[i].posY) {
@@ -132,11 +137,11 @@ function clearLastTarget(obj) {
     ctx.clearRect(posX, posY, size, size);
 }
 
-function drawStartSnake(obj) {
+snake.drawStartSnake = (obj) => {
     for(i in obj.length) {
         drawTarget(obj.length[i].posX, obj.length[i].posY, obj.color);
     }
-}
+};
 
 food.create = (obj, width, height) => {
     let x = Math.floor(Math.random() * (width-35)/20)*20; 
@@ -158,6 +163,7 @@ food.create = (obj, width, height) => {
 };
 
 window.onload = () => {
-    drawStartSnake(snake);
+    snake.drawStartSnake(snake);
     food.create(food, 640, 640);
+    snake.move(snake, snake.direction);
 };
