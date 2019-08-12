@@ -10,7 +10,7 @@ const snake = {
     { posX: 200, posY: 200 },
     { posX: 200 - size, posY: 200 }],
   color: 'green',
-  direction: 'RIGHT',
+  direction: '',
 };
 
 snake.head = snake.length[0];
@@ -20,53 +20,51 @@ const food = {
     posX: 0,
     posY: 0,
   },
-  color: 'red',
 };
 
 document.addEventListener('keydown', (e) => {
-    let key = e.keyCode;
-    
-    function direction(key) {
-        if(key === 37 && snake.direction !== 'RIGHT') {
-            snake.direction = 'LEFT';
-        }
-        else if(key === 38 && snake.direction !== 'DOWN') {
-            snake.direction = 'UP';
-        }
-        else if(key === 39 && snake.direction !== 'LEFT') {
-            snake.direction = 'RIGHT';
-        }
-        else if(key === 40 && snake.direction !== 'UP') {
-            snake.direction = 'DOWN';
-        }
-    }
+  const keyCode = e.keyCode;
 
-    direction(key);
+  function direction(key) {
+    if (key === 37 && snake.direction !== 'RIGHT') {
+      snake.direction = 'LEFT';
+    } 
+    else if (key === 38 && snake.direction !== 'DOWN') {
+      snake.direction = 'UP';
+    }
+    else if (key === 39 && snake.direction !== 'LEFT') {
+      snake.direction = 'RIGHT';
+    }
+    else if (key === 40 && snake.direction !== 'UP') {
+      snake.direction = 'DOWN';
+    }
+  }
+
+  direction(keyCode);
 });
 
 snake.move = (obj, dir) => {
-  let len = obj.length.length;
-  let posX = obj.length[len-1];
-  let posY = obj.length[len-1];
+  const len = obj.length.length;
+  const posX = obj.length[len - 1].posX;
+  const posY = obj.length[len - 1].posY;
 
   ctx.clearRect(posX, posY, size, size);
-
   if (dir === 'RIGHT') {
     obj.length.unshift(obj.length.pop());
     obj.length[0].posX = obj.length[1].posX + size;
     obj.length[0].posY = obj.length[1].posY;
     obj.head = obj.length[0];
-  } else if (dir === 'LEFT') {
+  } else if(dir === 'LEFT') {
     obj.length.unshift(obj.length.pop());
     obj.length[0].posX = obj.length[1].posX - size;
     obj.length[0].posY = obj.length[1].posY;
     obj.head = obj.length[0];
-  } else if (dir === 'UP') {
+  } else if(dir === 'UP') {
     obj.length.unshift(obj.length.pop());
     obj.length[0].posX = obj.length[1].posX;
     obj.length[0].posY = obj.length[1].posY - size;
     obj.head = obj.length[0];
-  } else if (dir === 'DOWN') {
+  } else if(dir === 'DOWN') {
     obj.length.unshift(obj.length.pop());
     obj.length[0].posX = obj.length[1].posX;
     obj.length[0].posY = obj.length[1].posY + size;
@@ -76,9 +74,9 @@ snake.move = (obj, dir) => {
   snake.crush();
   snake.eat();
   snake.drawBody(obj.head.posX, obj.head.posY, obj.color);
-  setTimeout(() => {
+  setTimeout(() => requestAnimationFrame(() => {
     snake.move(snake, snake.direction);
-  }, 60);
+  }), 1000/30);
 };
 
 snake.checkOverField = (obj, width, height) => {
@@ -123,18 +121,18 @@ snake.drawBody = (x, y, color) => {
 };
 
 snake.drawStartSnake = (obj) => {
-  for (i in obj.length) {
+  for (let i = 0; i < obj.length.length; i++) {
     snake.drawBody(obj.length[i].posX, obj.length[i].posY, obj.color);
   }
 };
 
 food.create = (obj, width, height) => {
-  const x = Math.floor(Math.random() * (width - 35) / 20) * 20;
-  const y = Math.floor(Math.random() * (height - 35) / 20) * 20;
+  const x = Math.floor((Math.random() * (width - 35)) / 20) * 20;
+  const y = Math.floor((Math.random() * (height - 35)) / 20) * 20;
   let correct = true;
 
-  for (i in snake.length) {
-    if (x == snake.length[i].posX && y == snake.length[i].posY) {
+  for (let i = 0; i < snake.length.length; i++) {
+    if (x === snake.length[i].posX && y === snake.length[i].posY) {
       correct = false;
       food.create(food, 660, 660);
     }
